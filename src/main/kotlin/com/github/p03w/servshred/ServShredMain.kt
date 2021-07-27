@@ -4,10 +4,15 @@ import mc.microconfig.MicroConfig
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents
+import net.fabricmc.fabric.api.resource.IdentifiableResourceReloadListener
+import net.fabricmc.fabric.api.resource.ResourceManagerHelper
 import net.minecraft.block.BlockState
+import net.minecraft.resource.ResourceType
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.stat.Stats
+import net.minecraft.tag.BlockTags
+import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 
@@ -24,14 +29,18 @@ class ServShredMain : ModInitializer {
                     else -> {}
                 }
                 if (player.mainHandStack.isSuitableFor(state) || player.isCreative) {
-                    activeVeining.add(
-                        VeiningInstance(
-                            world,
-                            pos,
-                            player,
-                            state.block
+                    val tag = BlockTags.getTagGroup().getTagOrEmpty(Identifier("servshred:veinmine"))
+                    println(tag.values())
+                    if (tag.contains(state.block)) {
+                        activeVeining.add(
+                            VeiningInstance(
+                                world,
+                                pos,
+                                player,
+                                state.block
+                            )
                         )
-                    )
+                    }
                 }
             }
         }

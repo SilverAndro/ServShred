@@ -9,6 +9,6 @@
     "#minecraft:iron_ores",
     "#minecraft:lapis_ores",
     "#minecraft:redstone_ores",
-    "minercraft:ancient_debris"
+    "minecraft:ancient_debris"
   ]
 }

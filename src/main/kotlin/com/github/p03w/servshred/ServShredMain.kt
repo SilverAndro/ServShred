@@ -27,7 +27,6 @@ class ServShredMain : ModInitializer {
                 }
                 if (player.mainHandStack.isSuitableFor(state) || player.isCreative) {
                     val tag = BlockTags.getTagGroup().getTagOrEmpty(Identifier("servshred:veinmine"))
-                    println(tag.values())
                     if (tag.contains(state.block)) {
                         activeVeining.add(
                             VeiningInstance(

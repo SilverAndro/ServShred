@@ -80,6 +80,7 @@ class ServShredMain : ModInitializer {
                                                 }
                                             }
                                         } else {
+                                            next.remove(offset)
                                             return@eachDir
                                         }
                                     }

@@ -25,7 +25,7 @@ public class ServShredConfig implements ConfigData {
         @Comment("Amount of exhaustion per block mined")
         public float exhaustionPerBlock = 0.01f;
         
-        @Comment("How much health to take when out of exhaustion")
+        @Comment("How much health to take when out of exhaustion (if noExhaustionLeftBehavior set to BLOOD)")
         public float bloodCost = 0.05f;
     }
     

@@ -26,8 +26,8 @@ dependencies {
 
     modImplementation "net.fabricmc:fabric-language-kotlin:${project.fabric_kotlin_version}"
 
-    modImplementation 'com.github.P03W:Microconfig:2.0.4'
-    include 'com.github.P03W:Microconfig:2.0.4'
+    modImplementation 'com.github.P03W:Microconfig:2.1.1'
+    include 'com.github.P03W:Microconfig:2.1.1'
 }
 
 processResources {

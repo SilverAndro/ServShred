@@ -157,9 +157,12 @@ class ServShredMain : ModInitializer {
     }
 
     companion object {
+        @JvmField
         val config: ServShredConfig = MicroConfig.getOrCreate("servshred", ServShredConfig())
 
+        @JvmField
         var isMining = false
+        @JvmField
         var activeVeining: MutableList<VeiningInstance> = mutableListOf()
     }
 }

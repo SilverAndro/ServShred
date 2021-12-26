@@ -10,6 +10,9 @@ public class ServShredConfig implements ConfigData {
     @Comment("If blocks should break all at once or progressively break over time (better on lower end servers or with higher maxBlocksMined counts)")
     public boolean progressiveMining = false;
     
+    @Comment("If the veinmining should be limited to the original block that was being mined or allow any veinminable block")
+    public boolean allowBlendingBlocks = false;
+    
     @Comment("If blocks should be checked at diagonals")
     public boolean diagonalMining = false;
     

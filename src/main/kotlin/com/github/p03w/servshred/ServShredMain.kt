@@ -16,6 +16,11 @@ import net.minecraft.util.math.Direction
 
 
 class ServShredMain : ModInitializer {
+    fun blockIsMinable(blockState: BlockState): Boolean {
+        val tag = BlockTags.getTagGroup().getTagOrEmpty(Identifier("servshred:veinmine"))
+        return tag.contains(blockState.block)
+    }
+
     override fun onInitialize() {
         println("ServShred is starting")
 
@@ -31,8 +36,7 @@ class ServShredMain : ModInitializer {
                 // Check the tool is the right one for the block, or is in creative
                 if (player.mainHandStack.isSuitableFor(state) || player.isCreative) {
                     // If so, check if it's in the tag of blocks allowed to be vein-mined
-                    val tag = BlockTags.getTagGroup().getTagOrEmpty(Identifier("servshred:veinmine"))
-                    if (tag.contains(state.block)) {
+                    if (blockIsMinable(state)) {
                         // Start the vein-mining action
                         activeVeining.add(
                             VeiningInstance(
@@ -69,8 +73,8 @@ class ServShredMain : ModInitializer {
                                     // Mark it as checked and get it
                                     cache.add(offset)
                                     val state = world.getBlockState(offset)
-                                    // If it matches the block we started with
-                                    if (state.block == instance.toMine) {
+                                    // If it matches the block we started with OR
+                                    if (state.block == instance.toMine || (config.allowBlendingBlocks && blockIsMinable(state))) {
                                         // Add it to the list of points for next time
                                         if (!instance.floodFillPoints.contains(offset)) {
                                             next.add(offset)

@@ -4,21 +4,25 @@ import mc.microconfig.MicroConfig
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents
+import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.entity.damage.DamageSource
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.stat.Stats
 import net.minecraft.tag.BlockTags
+import net.minecraft.tag.TagKey
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
+import net.minecraft.util.registry.Registry
 
 
 class ServShredMain : ModInitializer {
+    val SHRED_ORES: TagKey<Block> = TagKey.of<Block>(Registry.BLOCK_KEY, Identifier
+        ("servshred", "veinmine"))
     fun blockIsMinable(blockState: BlockState): Boolean {
-        val tag = BlockTags.getTagGroup().getTagOrEmpty(Identifier("servshred:veinmine"))
-        return tag.contains(blockState.block)
+        return blockState.streamTags().toList().contains(SHRED_ORES);
     }
 
     override fun onInitialize() {

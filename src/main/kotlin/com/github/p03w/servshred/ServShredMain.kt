@@ -16,13 +16,22 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.registry.tag.TagKey
 
+object ServShredMain : ModInitializer {
+    @JvmField
+    val config: ServShredConfig = MicroConfig.getOrCreate("servshred", ServShredConfig())
 
-class ServShredMain : ModInitializer {
-    val SHRED_ORES: TagKey<Block> = TagKey.of<Block>(
-        RegistryKeys.BLOCK, Identifier
-        ("servshred", "veinmine"))
-    fun blockIsMinable(blockState: BlockState): Boolean {
-        return blockState.streamTags().toList().contains(SHRED_ORES);
+    @JvmField
+    var isMining = false
+    @JvmField
+    var activeVeining: MutableList<VeiningInstance> = mutableListOf()
+
+    private val SHRED_ORES: TagKey<Block> = TagKey.of(
+        RegistryKeys.BLOCK,
+        Identifier("servshred", "veinmine")
+    )
+
+    private fun blockIsMinable(blockState: BlockState): Boolean {
+        return blockState.isIn(SHRED_ORES)
     }
 
     override fun onInitialize() {
@@ -148,6 +157,8 @@ class ServShredMain : ModInitializer {
         // Grant stats and preform exhaustion costs
         val miner = instance.miner
         miner.incrementStat(Stats.MINED.getOrCreateStat(state.block))
+
+        // Return if the mining should be allowed to continue
         return if (miner.hungerManager.foodLevel > 0) {
             miner.addExhaustion(config.miningCost.exhaustionPerBlock)
             true
@@ -159,18 +170,9 @@ class ServShredMain : ModInitializer {
                     miner.damage(DamageSource.STARVE, config.miningCost.bloodCost)
                     true
                 }
+
                 else -> false
             }
         }
-    }
-
-    companion object {
-        @JvmField
-        val config: ServShredConfig = MicroConfig.getOrCreate("servshred", ServShredConfig())
-
-        @JvmField
-        var isMining = false
-        @JvmField
-        var activeVeining: MutableList<VeiningInstance> = mutableListOf()
     }
 }

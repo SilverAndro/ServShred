@@ -1,8 +1,5 @@
-package com.github.p03w.servshred
+package io.github.silverandro.servshred
 
-import mc.microconfig.MicroConfig
-import net.fabricmc.api.ModInitializer
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
@@ -15,10 +12,17 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.registry.tag.TagKey
+import org.quiltmc.loader.api.ModContainer
+import org.quiltmc.loader.api.config.QuiltConfig
+import org.quiltmc.qsl.lifecycle.api.event.ServerWorldTickEvents
 
-object ServShredMain : ModInitializer {
+object ServShredMain : org.quiltmc.qsl.base.api.entrypoint.ModInitializer {
     @JvmField
-    val config: ServShredConfig = MicroConfig.getOrCreate("servshred", ServShredConfig())
+    val config = QuiltConfig.create(
+        "servershred",
+        "main",
+        ServShredConfig::class.java
+    )
 
     @JvmField
     var isMining = false
@@ -34,8 +38,9 @@ object ServShredMain : ModInitializer {
         return blockState.isIn(SHRED_ORES)
     }
 
-    override fun onInitialize() {
-        println("ServShred is starting")
+    override fun onInitialize(mod: ModContainer) {
+        println("ServShred is starting! REA id: ${BlendableEntry.REA.id()}")
+        BuiltinRegistration.register(mod)
 
         PlayerBlockBreakEvents.AFTER.register { world, player, pos, state, _ ->
             // Make sure we're on the server and this isn't the result of a player vein-mining something
@@ -64,7 +69,7 @@ object ServShredMain : ModInitializer {
             }
         }
 
-        ServerTickEvents.END_WORLD_TICK.register { world ->
+        ServerWorldTickEvents.END.register { _, world ->
             // Remove any points where the player has left or theres nothing left to mine
             activeVeining = activeVeining.filterNotTo(mutableListOf()) { it.miner.isDisconnected || it.floodFillPoints.size <= 0 }
 
@@ -87,7 +92,7 @@ object ServShredMain : ModInitializer {
                                     cache.add(offset)
                                     val state = world.getBlockState(offset)
                                     // If it matches the block we started with OR
-                                    if (state.block == instance.toMine || (config.allowBlendingBlocks && blockIsMinable(state))) {
+                                    if (state.block == instance.toMine || (BlendableEntry.shouldBlendWith(instance.toMine, state.block) && blockIsMinable(state))) {
                                         // Add it to the list of points for next time
                                         if (!instance.floodFillPoints.contains(offset)) {
                                             next.add(offset)

@@ -1,35 +1,32 @@
-package com.github.p03w.servshred;
+package io.github.silverandro.servshred;
 
-import mc.microconfig.Comment;
-import mc.microconfig.ConfigData;
+import org.quiltmc.config.api.WrappedConfig;
+import org.quiltmc.config.api.annotations.Comment;
 
-public class ServShredConfig implements ConfigData {
+public class ServShredConfig extends WrappedConfig {
     @Comment("The max amount of blocks that can be scanned")
-    public int maxBlocks = 64;
+    public final int maxBlocks = 64;
     
     @Comment("If blocks should break all at once or progressively break over time (better on lower end servers or with higher maxBlocksMined counts)")
-    public boolean progressiveMining = false;
-    
-    @Comment("If the veinmining should be limited to the original block that was being mined or allow any veinminable block")
-    public boolean allowBlendingBlocks = false;
+    public final boolean progressiveMining = false;
     
     @Comment("If blocks should be checked at diagonals")
-    public boolean diagonalMining = false;
+    public final boolean diagonalMining = false;
     
     @Comment("What shifting should do\nENABLE - Shifting is required to vein mine\nDISABLE - Shifting turns off vein mining\nNOTHING - Vein mining is always on")
-    public ShiftBehavior shiftBehavior = ShiftBehavior.ENABLE;
+    public final ShiftBehavior shiftBehavior = ShiftBehavior.ENABLE;
     
-    public ExhaustBehavior miningCost = new ExhaustBehavior();
+    public final ExhaustBehavior miningCost = new ExhaustBehavior();
     
-    public static class ExhaustBehavior implements ConfigData {
+    public static class ExhaustBehavior implements Section {
         @Comment("What to do if the player runs out of exhaustion to spend\nSTOP - Stops the mining\nALLOW - Continues mining\nBLOOD - Starts taking health from the player")
-        public NoExhaustionBehavior noExhaustionLeftBehavior = NoExhaustionBehavior.STOP;
+        public final NoExhaustionBehavior noExhaustionLeftBehavior = NoExhaustionBehavior.STOP;
         
         @Comment("Amount of exhaustion per block mined")
-        public float exhaustionPerBlock = 0.01f;
+        public final float exhaustionPerBlock = 0.01f;
         
         @Comment("How much health to take when out of exhaustion (if noExhaustionLeftBehavior set to BLOOD)")
-        public float bloodCost = 0.05f;
+        public final float bloodCost = 0.05f;
     }
     
     public enum NoExhaustionBehavior {

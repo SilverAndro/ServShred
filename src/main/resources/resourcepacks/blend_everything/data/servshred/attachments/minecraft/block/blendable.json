@@ -1,0 +1,6 @@
+{
+  "replace": true,
+  "values": {
+    "#servshred:veinmine": [ "#servshred:veinmine" ]
+  }
+}

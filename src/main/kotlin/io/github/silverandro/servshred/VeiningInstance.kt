@@ -1,4 +1,4 @@
-package com.github.p03w.servshred
+package io.github.silverandro.servshred
 
 import net.minecraft.block.Block
 import net.minecraft.server.network.ServerPlayerEntity

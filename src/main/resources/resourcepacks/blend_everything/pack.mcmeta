@@ -1,0 +1,6 @@
+{
+    "pack": {
+        "pack_format": 10,
+        "description": "Allows all veinmineable blocks to blend into all other veinmineable blocks while veinmining"
+    }
+}

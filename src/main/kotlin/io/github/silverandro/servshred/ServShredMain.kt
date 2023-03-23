@@ -3,15 +3,14 @@ package io.github.silverandro.servshred
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
-import net.minecraft.entity.damage.DamageSource
 import net.minecraft.registry.RegistryKeys
+import net.minecraft.registry.tag.TagKey
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.stat.Stats
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
-import net.minecraft.registry.tag.TagKey
 import org.quiltmc.loader.api.ModContainer
 import org.quiltmc.loader.api.config.QuiltConfig
 import org.quiltmc.qsl.lifecycle.api.event.ServerWorldTickEvents
@@ -172,7 +171,7 @@ object ServShredMain : org.quiltmc.qsl.base.api.entrypoint.ModInitializer {
                 ServShredConfig.NoExhaustionBehavior.ALLOW -> true
                 ServShredConfig.NoExhaustionBehavior.STOP -> false
                 ServShredConfig.NoExhaustionBehavior.BLOOD -> {
-                    miner.damage(DamageSource.STARVE, config.miningCost.bloodCost)
+                    miner.damage(miner.world.damageSources.starve(), config.miningCost.bloodCost)
                     true
                 }
 

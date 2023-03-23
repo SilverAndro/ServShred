@@ -22,7 +22,7 @@ dependencies {
     modImplementation "org.quiltmc:quilt-loader:${project.loader_version}"
 
     modImplementation "org.quiltmc:qsl:${qsl_version}+${minecraft_version}"
-    modImplementation "org.quiltmc.quilted-fabric-api:quilted-fabric-api:${qfapi_version}"
+    modImplementation "org.quiltmc.quilted-fabric-api:quilted-fabric-api:${qfapi_version}-${minecraft_version}"
     modImplementation "org.quiltmc.quilt-kotlin-libraries:quilt-kotlin-libraries:+"
 }
 

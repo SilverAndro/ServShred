@@ -18,7 +18,7 @@ repositories {
 dependencies {
     //to change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings "org.quiltmc:quilt-mappings:${minecraft_version}+build.${quilt_mappings}:intermediary-v2"
+	mappings "org.quiltmc:quilt-mappings:${minecraft_version}+build.${quilt_mappings}:intermediary-v2"
     modImplementation "org.quiltmc:quilt-loader:${project.loader_version}"
 
     modImplementation "org.quiltmc:qsl:${qsl_version}+${minecraft_version}"

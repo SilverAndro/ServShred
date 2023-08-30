@@ -3,6 +3,7 @@ package io.github.silverandro.servshred
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
+import net.minecraft.registry.RegistryKey
 import net.minecraft.registry.RegistryKeys
 import net.minecraft.registry.tag.TagKey
 import net.minecraft.server.network.ServerPlayerEntity
@@ -27,6 +28,8 @@ object ServShredMain : org.quiltmc.qsl.base.api.entrypoint.ModInitializer {
     var isMining = false
     @JvmField
     var activeVeining: MutableList<VeiningInstance> = mutableListOf()
+
+    val DAMAGE_TYPE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Identifier("servshred", "blood"))
 
     private val SHRED_ORES: TagKey<Block> = TagKey.of(
         RegistryKeys.BLOCK,
@@ -171,7 +174,12 @@ object ServShredMain : org.quiltmc.qsl.base.api.entrypoint.ModInitializer {
                 ServShredConfig.NoExhaustionBehavior.ALLOW -> true
                 ServShredConfig.NoExhaustionBehavior.STOP -> false
                 ServShredConfig.NoExhaustionBehavior.BLOOD -> {
-                    miner.damage(miner.world.damageSources.starve(), config.miningCost.bloodCost)
+                    val dmg = miner.world.damageSources.create(DAMAGE_TYPE, null)
+                    var n = 1
+
+                    do {
+                        val res = miner.damage(dmg, config.miningCost.bloodCost * n++)
+                    } while (!res && n <= 25)
                     true
                 }
 

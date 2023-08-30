@@ -23,10 +23,10 @@ public class ServShredConfig extends WrappedConfig {
         public final NoExhaustionBehavior noExhaustionLeftBehavior = NoExhaustionBehavior.STOP;
         
         @Comment("Amount of exhaustion per block mined")
-        public final float exhaustionPerBlock = 0.01f;
+        public final float exhaustionPerBlock = 0.05f;
         
         @Comment("How much health to take when out of exhaustion (if noExhaustionLeftBehavior set to BLOOD)")
-        public final float bloodCost = 0.05f;
+        public final float bloodCost = 0.5f;
     }
     
     public enum NoExhaustionBehavior {

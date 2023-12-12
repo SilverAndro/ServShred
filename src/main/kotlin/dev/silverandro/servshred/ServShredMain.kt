@@ -1,4 +1,4 @@
-package io.github.silverandro.servshred
+package dev.silverandro.servshred
 
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents
 import net.minecraft.block.Block
@@ -13,8 +13,11 @@ import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import org.quiltmc.loader.api.ModContainer
-import org.quiltmc.loader.api.config.QuiltConfig
+import org.quiltmc.loader.api.config.v2.QuiltConfig
 import org.quiltmc.qsl.lifecycle.api.event.ServerWorldTickEvents
+import org.quiltmc.qsl.networking.api.*
+import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 
 object ServShredMain : org.quiltmc.qsl.base.api.entrypoint.ModInitializer {
     @JvmField
@@ -30,6 +33,8 @@ object ServShredMain : org.quiltmc.qsl.base.api.entrypoint.ModInitializer {
     var activeVeining: MutableList<VeiningInstance> = mutableListOf()
 
     val DAMAGE_TYPE = RegistryKey.of(RegistryKeys.DAMAGE_TYPE, Identifier("servshred", "blood"))
+    val STATUS_PACKET_ID = Identifier("servshred", "status")
+    val PLAYER_STATUS = ConcurrentHashMap<UUID, Boolean>()
 
     private val SHRED_ORES: TagKey<Block> = TagKey.of(
         RegistryKeys.BLOCK,
@@ -44,15 +49,33 @@ object ServShredMain : org.quiltmc.qsl.base.api.entrypoint.ModInitializer {
         println("ServShred is starting! REA id: ${BlendableEntry.REA.id()}")
         BuiltinRegistration.register(mod)
 
+        ServerPlayNetworking.registerGlobalReceiver(STATUS_PACKET_ID) { server, player, _, buf, _ ->
+            val unbound = buf.readBoolean()
+            val newStatus = buf.readBoolean()
+            server.execute {
+                if (!unbound) {
+                    PLAYER_STATUS[player.uuid] = newStatus
+                } else {
+                    PLAYER_STATUS.remove(player.uuid)
+                }
+            }
+        }
+
         PlayerBlockBreakEvents.AFTER.register { world, player, pos, state, _ ->
             // Make sure we're on the server and this isn't the result of a player vein-mining something
             if (world is ServerWorld && player is ServerPlayerEntity && !isMining) {
                 // Don't try to vein-mine if the player is doing an action that would disable it
-                when (config.shiftBehavior) {
-                    ServShredConfig.ShiftBehavior.ENABLE -> if (!player.isSneaking) return@register
-                    ServShredConfig.ShiftBehavior.DISABLE -> if (player.isSneaking) return@register
-                    else -> {}
+                val status = PLAYER_STATUS[player.uuid]
+                if (status == false) {
+                    return@register
+                } else if (status == null) {
+                    when (config.shiftBehavior.value()) {
+                        ServShredConfig.ShiftBehavior.ENABLE -> if (!player.isSneaking) return@register
+                        ServShredConfig.ShiftBehavior.DISABLE -> if (player.isSneaking) return@register
+                        else -> {}
+                    }
                 }
+
                 // Check the tool is the right one for the block, or is in creative
                 if (player.mainHandStack.isSuitableFor(state) || player.isCreative) {
                     // If so, check if it's in the tag of blocks allowed to be vein-mined
@@ -72,8 +95,8 @@ object ServShredMain : org.quiltmc.qsl.base.api.entrypoint.ModInitializer {
         }
 
         ServerWorldTickEvents.END.register { _, world ->
-            // Remove any points where the player has left or theres nothing left to mine
-            activeVeining = activeVeining.filterNotTo(mutableListOf()) { it.miner.isDisconnected || it.floodFillPoints.size <= 0 }
+            // Remove any points where the player has left/died or theres nothing left to mine
+            activeVeining = activeVeining.filterNotTo(mutableListOf()) { it.miner.isDisconnected || !it.miner.isAlive || it.floodFillPoints.size <= 0 }
 
             // Set the flag to ignore mining events
             isMining = true
@@ -88,12 +111,12 @@ object ServShredMain : org.quiltmc.qsl.base.api.entrypoint.ModInitializer {
                         instance.floodFillPoints.forEach { pos ->
                             // On every direction to check
                             forEachDirection(pos) eachDir@{ offset ->
-                                // If we have remaining buffer of blocks that can be mined and havent already checked here
+                                // If we have remaining buffer of blocks that can be mined and haven't already checked here
                                 if (instance.remainingBlocks > 0 && !cache.contains(offset)) {
                                     // Mark it as checked and get it
                                     cache.add(offset)
                                     val state = world.getBlockState(offset)
-                                    // If it matches the block we started with OR
+                                    // If it matches the block we started with OR should blend
                                     if (state.block == instance.toMine || (BlendableEntry.shouldBlendWith(instance.toMine, state.block) && blockIsMinable(state))) {
                                         // Add it to the list of points for next time
                                         if (!instance.floodFillPoints.contains(offset)) {
@@ -135,7 +158,7 @@ object ServShredMain : org.quiltmc.qsl.base.api.entrypoint.ModInitializer {
                         instance.floodFillPoints.clear()
                         instance.floodFillPoints.addAll(next)
                     // Do it again if we have points left and progressive mining is off
-                    } while (instance.floodFillPoints.size > 0 && !config.progressiveMining)
+                    } while (instance.floodFillPoints.size > 0 && !config.progressiveMining.value())
                 }
             }
             // Mark it safe to accept mining events again
@@ -148,7 +171,7 @@ object ServShredMain : org.quiltmc.qsl.base.api.entrypoint.ModInitializer {
         Direction.values().forEach {
             action(pos.offset(it))
         }
-        if (config.diagonalMining) {
+        if (config.diagonalMining.value()) {
             action(pos.add(1, 1, 0))
             action(pos.add(1, -1, 0))
             action(pos.add(-1, 1, 0))
@@ -167,10 +190,10 @@ object ServShredMain : org.quiltmc.qsl.base.api.entrypoint.ModInitializer {
 
         // Return if the mining should be allowed to continue
         return if (miner.hungerManager.foodLevel > 0) {
-            miner.addExhaustion(config.miningCost.exhaustionPerBlock)
+            miner.addExhaustion(config.miningCost.exhaustionPerBlock.value())
             true
         } else {
-            when (config.miningCost.noExhaustionLeftBehavior) {
+            when (config.miningCost.noExhaustionLeftBehavior.value()) {
                 ServShredConfig.NoExhaustionBehavior.ALLOW -> true
                 ServShredConfig.NoExhaustionBehavior.STOP -> false
                 ServShredConfig.NoExhaustionBehavior.BLOOD -> {
@@ -178,7 +201,7 @@ object ServShredMain : org.quiltmc.qsl.base.api.entrypoint.ModInitializer {
                     var n = 1
 
                     do {
-                        val res = miner.damage(dmg, config.miningCost.bloodCost * n++)
+                        val res = miner.damage(dmg, config.miningCost.bloodCost.value() * n++)
                     } while (!res && n <= 25)
                     true
                 }

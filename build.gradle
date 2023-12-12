@@ -26,7 +26,7 @@ dependencies {
     modImplementation "org.quiltmc:quilt-loader:${project.loader_version}"
 
     modImplementation "org.quiltmc.quilted-fabric-api:quilted-fabric-api:${qfapi_version}-${minecraft_version}"
-    modImplementation "org.quiltmc.quilt-kotlin-libraries:quilt-kotlin-libraries:+"
+    modImplementation "org.quiltmc.quilt-kotlin-libraries:quilt-kotlin-libraries:2.1.2+kt.1.9.0+flk.1.10.8"
 
     modImplementation("xyz.nucleoid:server-translations-api:2.0.0+1.20") {
         exclude(group: "net.fabricmc", module: "fabric-loader")

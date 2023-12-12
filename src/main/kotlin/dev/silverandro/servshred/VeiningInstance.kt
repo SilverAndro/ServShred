@@ -1,4 +1,4 @@
-package io.github.silverandro.servshred
+package dev.silverandro.servshred
 
 import net.minecraft.block.Block
 import net.minecraft.server.network.ServerPlayerEntity
@@ -17,5 +17,5 @@ data class VeiningInstance(
     @JvmField
     val floodFillPoints: MutableSet<BlockPos> = mutableSetOf(origin),
     @JvmField
-    var remainingBlocks: Int = ServShredMain.config.maxBlocks
+    var remainingBlocks: Int = ServShredMain.config.maxBlocks.value()
 )

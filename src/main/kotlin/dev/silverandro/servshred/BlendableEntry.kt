@@ -1,4 +1,4 @@
-package io.github.silverandro.servshred
+package dev.silverandro.servshred
 
 import com.mojang.serialization.Codec
 import net.minecraft.block.Block

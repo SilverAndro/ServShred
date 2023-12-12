@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "quilt_loader": {
-    "group": "io.github.silverandro",
+    "group": "dev.silverandro",
     "id": "servshred",
     "version": "${version}",
     "metadata": {
@@ -15,19 +15,23 @@
         "issues": "https://github.com/SilverAndro/ServShred/issues",
         "sources": "https://github.com/SilverAndro/ServShred"
       },
-      "icon": "assets/example_mod/icon.png"
+      "icon": "assets/servshred/icon.png"
     },
     "intermediate_mappings": "net.fabricmc:intermediary",
     "entrypoints": {
       "init": {
         "adapter": "kotlin",
-        "value": "io.github.silverandro.servshred.ServShredMain"
+        "value": "dev.silverandro.servshred.ServShredMain"
+      },
+      "client_init": {
+        "adapter": "kotlin",
+        "value": "dev.silverandro.servshred.ServShredClient"
       }
     },
     "depends": [
       {
         "id": "quilt_loader",
-        "versions": ">=0.19.0-"
+        "versions": ">=0.22.0-"
       },
       {
         "id": "quilted_fabric_api",

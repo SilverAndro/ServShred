@@ -1,4 +1,4 @@
-package io.github.silverandro.servshred
+package dev.silverandro.servshred
 
 import net.minecraft.util.Identifier
 import org.quiltmc.loader.api.ModContainer

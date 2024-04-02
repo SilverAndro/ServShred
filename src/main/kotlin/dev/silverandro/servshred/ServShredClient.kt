@@ -21,9 +21,9 @@ object ServShredClient : ClientModInitializer {
         ).also { it.setBoundKey(InputUtil.UNKNOWN_KEY) }
     )
 
-    var forceSend = true
-    var lastStatus = false
-    var wasUnbound = true
+    private var forceSend = true
+    private var lastStatus = false
+    private var wasUnbound = true
 
     @JvmField
     val config = QuiltConfig.create(

@@ -35,15 +35,15 @@
       },
       {
         "id": "quilted_fabric_api",
-        "versions": ">=7.0.0-"
+        "versions": ">=8.0.0-"
       },
       {
         "id": "qkl",
-        "versions": ">=2.0.0"
+        "versions": ">=3.0.0"
       },
       {
         "id": "minecraft",
-        "versions": ">=1.20.1"
+        "versions": ">=1.20.2"
       }
     ]
   }

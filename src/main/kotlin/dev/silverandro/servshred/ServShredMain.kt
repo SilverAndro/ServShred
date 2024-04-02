@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentHashMap
 
 object ServShredMain : org.quiltmc.qsl.base.api.entrypoint.ModInitializer {
     @JvmField
-    val config = QuiltConfig.create(
+    val config: ServShredConfig = QuiltConfig.create(
         "servershred",
         "main",
         ServShredConfig::class.java
